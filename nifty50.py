@@ -1,7 +1,6 @@
 import streamlit as st
 import yfinance as yf
 import pandas as pd
-from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 import plotly.express as px
 import pandas_datareader.data as pdr
