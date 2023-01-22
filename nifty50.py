@@ -21,13 +21,31 @@ if stock:
     st.image(imgUrl)
     st.text(f"1-year stock price of {stock_data.get_info()['shortName']} ")
 
-    ## show stock price
+    ## parse 1yr data
     stock_price = stock_data.history(period="1y")
-    fig = px.line(stock_price['Close'], width=700, height=500)
+    stock_price.reset_index(inplace=True)
+
+
+    ## show stock price plot
+    fig = px.line(stock_price, x='Date', y='Close')
+    fig.update_xaxes(
+        # rangeslider_visible=True,
+        rangeselector=dict(
+            buttons=list([
+                dict(count=7, label="1w", step="day", stepmode="backward"),
+                dict(count=1, label="1m", step="month", stepmode="backward"),
+                dict(count=3, label="3m", step="month", stepmode="backward"),
+                # dict(count=6, label="6m", step="month", stepmode="backward"),
+                dict(count=1, label="YTD", step="year", stepmode="todate"),
+                dict(count=1, label="1y", step="year", stepmode="backward"),
+                # dict(step="all")
+            ])
+        )
+    )
     st.plotly_chart(fig)
 
+
     ## date formatting
-    stock_price.reset_index(inplace=True)
     stock_price['Date'] = pd.to_datetime(stock_price['Date'])
     stock_price['Date'] = stock_price['Date'].dt.strftime('%b-%d, %Y')  ## Jan-20, 2023
     
@@ -42,6 +60,18 @@ if stock:
     stockDetail = pd.DataFrame(columns=['Current price', '1 week return', '1 month return', '3 months return', '1 year return'])
     stockDetail.loc[today] = [current_price.round(2), str(one_week_change)+" %", str(one_month_change)+" %", str(three_month_change)+" %", str(one_year_change)+" %" ]
     st.dataframe(stockDetail)
+
+
+    # stockDetail = pd.DataFrame(columns=['Day', 'Price', 'Pct change'])
+    # stockDetail.loc['Current day'] = [today,current_price , 0]
+    # stockDetail.loc['1 week'] = [stock_price.Date.iloc[-6],
+    #                              stock_price['Close'].iloc[-6], one_week_change]
+    # stockDetail.loc['1 month'] = [stock_price.Date.iloc[-21],
+    #                              stock_price['Close'].iloc[-21], one_month_change]
+    # stockDetail.loc['3 month'] = [stock_price.Date.iloc[-63],
+    #                              stock_price['Close'].iloc[-63], three_month_change]
+    # st.dataframe(stockDetail)
+
 
 
 
