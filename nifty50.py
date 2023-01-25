@@ -10,16 +10,25 @@ yf.pdr_override()
 nifty_50 = ['ADANIPORTS.NS', 'ADANIENT.NS', 'APOLLOHOSP.NS', 'ASIANPAINT.NS', 'AXISBANK.NS', 'BAJAJ-AUTO.NS', 'BAJAJFINSV.NS', 'BAJFINANCE.NS', 'BHARTIARTL.NS', 'BPCL.NS', 'BRITANNIA.NS', 
            'CIPLA.NS', 'COALINDIA.NS', 'DIVISLAB.NS', 'DRREDDY.NS', 'EICHERMOT.NS', 'GRASIM.NS', 'HCLTECH.NS', 'HDFC.NS', 'HDFCBANK.NS', 'HDFCLIFE.NS', 'HEROMOTOCO.NS', 'HINDALCO.NS', 'HINDUNILVR.NS', 'ICICIBANK.NS', 'INDUSINDBK.NS', 'INFY.NS', 'ITC.NS', 'JSWSTEEL.NS', 'KOTAKBANK.NS', 'LT.NS', 'M&M.NS', 'MARUTI.NS', 'NESTLEIND.NS', 'NTPC.NS', 'ONGC.NS', 'POWERGRID.NS', 'RELIANCE.NS', 'SBILIFE.NS', 'SBIN.NS', 'SUNPHARMA.NS', 'TATACONSUM.NS', 'TATAMOTORS.NS', 'TATASTEEL.NS', 'TCS.NS', 'TECHM.NS', 'TITAN.NS', 'ULTRACEMCO.NS', 'UPL.NS', 'WIPRO.NS']
 
+nifty_df = pd.read_csv('nifty50_info.csv')
 st.sidebar.title("Nifty 50 Stocks")
 stock = st.sidebar.selectbox("Select a stock", nifty_50)
 
 
+
 if stock:
     ## show logo
+
     stock_data = yf.Ticker(stock)
-    imgUrl = stock_data.get_info()['logo_url']
-    st.image(imgUrl)
-    st.text(f"1-year stock price of {stock_data.get_info()['shortName']} ")
+
+    ## reading names from df
+    stockname = nifty_df.loc[nifty_df.ticker == f'{stock}']['shortName'].to_list()[0]
+    logo_url = nifty_df.loc[nifty_df.ticker == f'{stock}']['logo_url'].to_list()[0]
+
+    ## show company logo
+    st.image(logo_url)
+    st.text(f"{stockname}: 1-year stock price")
+
 
     ## parse 1yr data
     stock_price = stock_data.history(period="1y")
