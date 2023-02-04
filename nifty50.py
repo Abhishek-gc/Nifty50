@@ -3,32 +3,46 @@ import yfinance as yf
 import pandas as pd
 import matplotlib.pyplot as plt
 import plotly.express as px
+import plotly.graph_objects as go
+from datetime import date, timedelta
 import pandas_datareader.data as pdr
+from statsmodels.tsa.holtwinters import ExponentialSmoothing
 yf.pdr_override()
 
 
 nifty_50 = ['ADANIPORTS.NS', 'ADANIENT.NS', 'APOLLOHOSP.NS', 'ASIANPAINT.NS', 'AXISBANK.NS', 'BAJAJ-AUTO.NS', 'BAJAJFINSV.NS', 'BAJFINANCE.NS', 'BHARTIARTL.NS', 'BPCL.NS', 'BRITANNIA.NS', 
            'CIPLA.NS', 'COALINDIA.NS', 'DIVISLAB.NS', 'DRREDDY.NS', 'EICHERMOT.NS', 'GRASIM.NS', 'HCLTECH.NS', 'HDFC.NS', 'HDFCBANK.NS', 'HDFCLIFE.NS', 'HEROMOTOCO.NS', 'HINDALCO.NS', 'HINDUNILVR.NS', 'ICICIBANK.NS', 'INDUSINDBK.NS', 'INFY.NS', 'ITC.NS', 'JSWSTEEL.NS', 'KOTAKBANK.NS', 'LT.NS', 'M&M.NS', 'MARUTI.NS', 'NESTLEIND.NS', 'NTPC.NS', 'ONGC.NS', 'POWERGRID.NS', 'RELIANCE.NS', 'SBILIFE.NS', 'SBIN.NS', 'SUNPHARMA.NS', 'TATACONSUM.NS', 'TATAMOTORS.NS', 'TATASTEEL.NS', 'TCS.NS', 'TECHM.NS', 'TITAN.NS', 'ULTRACEMCO.NS', 'UPL.NS', 'WIPRO.NS']
 
-nifty_df = pd.read_csv('nifty50_info.csv')
+nifty_info = pd.read_csv('nifty50_info.csv')
 st.sidebar.title("Nifty 50 Stocks")
 stock = st.sidebar.selectbox("Select a stock", nifty_50)
 
+def get_workingdays(start, end, excluded=(6, 7)):
+    days = []
+    while start <= end:
+        if start.isoweekday() not in excluded:
+            # days.append(start.strftime('%d-%m-%Y'))
+            days.append(start.strftime('%b-%d, %Y'))
 
+        start += timedelta(days=1)
+    return days
+
+start_date = date.today()
+end_date = (date.today() + timedelta(15))
+future_working_days = get_workingdays(start_date,end_date)[:10]
 
 if stock:
-    ## show logo
-
-    stock_data = yf.Ticker(stock)
 
     ## reading names from df
-    stockname = nifty_df.loc[nifty_df.ticker == f'{stock}']['shortName'].to_list()[0]
-    logo_url = nifty_df.loc[nifty_df.ticker == f'{stock}']['logo_url'].to_list()[0]
+    stockname = nifty_info.loc[nifty_info.ticker == f'{stock}']['shortName'].to_list()[0]
+    logo_url = nifty_info.loc[nifty_info.ticker == f'{stock}']['logo_url'].to_list()[0]
 
     ## show company logo
     st.image(logo_url)
     st.text(f"{stockname}: 1-year stock price")
 
+    ## Getting data from yfinance
+    stock_data = yf.Ticker(stock)
 
     ## parse 1yr data
     stock_price = stock_data.history(period="1y")
@@ -57,7 +71,9 @@ if stock:
     ## date formatting
     stock_price['Date'] = pd.to_datetime(stock_price['Date'])
     stock_price['Date'] = stock_price['Date'].dt.strftime('%b-%d, %Y')  ## Jan-20, 2023
-    
+
+
+    st.subheader('Returns:')
     ## show current price, 1 week, 1month, 3month, 1 year percentage change
     today = stock_price.Date.iloc[-1]
     current_price = stock_price['Close'].iloc[-1]
@@ -70,7 +86,6 @@ if stock:
     stockDetail.loc[today] = [current_price.round(2), str(one_week_change)+" %", str(one_month_change)+" %", str(three_month_change)+" %", str(one_year_change)+" %" ]
     st.dataframe(stockDetail)
 
-
     # stockDetail = pd.DataFrame(columns=['Day', 'Price', 'Pct change'])
     # stockDetail.loc['Current day'] = [today,current_price , 0]
     # stockDetail.loc['1 week'] = [stock_price.Date.iloc[-6],
@@ -80,6 +95,25 @@ if stock:
     # stockDetail.loc['3 month'] = [stock_price.Date.iloc[-63],
     #                              stock_price['Close'].iloc[-63], three_month_change]
     # st.dataframe(stockDetail)
+
+
+    ## Forecasting
+    st.subheader('Forecasting using Triple Exponential series')
+    # Build the Triple Exponential Smoothing model
+    model = ExponentialSmoothing(stock_price['Close'], trend='add', seasonal='multiplicative', seasonal_periods=12)
+    model_fit = model.fit()
+    forecast = model_fit.forecast(steps=5)
+
+    fig = go.Figure()
+    fig.add_trace(go.Scatter( x=stock_price['Date'].tail(7), y=stock_price['Close'].tail(7), name='Actual',
+                             line=dict(color='royalblue', width=3)))
+    fig.add_trace(go.Scatter(x=future_working_days, y=forecast.values.tolist(), name='Forecast',
+                             line=dict(color='firebrick', width=3)))
+
+    st.plotly_chart(fig)
+
+
+
 
 
 
