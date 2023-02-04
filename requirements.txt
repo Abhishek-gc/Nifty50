@@ -4,3 +4,4 @@ yfinance
 plotly
 pandas_datareader
 matplotlib
+statsmodels
