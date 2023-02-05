@@ -7,6 +7,8 @@ import plotly.graph_objects as go
 from datetime import date, timedelta
 import pandas_datareader.data as pdr
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
+from prophet import Prophet
+from prophet.plot import plot_plotly, plot_components_plotly
 yf.pdr_override()
 
 
@@ -97,8 +99,8 @@ if stock:
     # st.dataframe(stockDetail)
 
 
-    ## Forecasting
-    st.subheader('Forecasting using Triple Exponential series')
+    ## Forecasting with TES
+    st.subheader('Forecasting with Triple Exponential series')
     # Build the Triple Exponential Smoothing model
     model = ExponentialSmoothing(stock_price['Close'], trend='add', seasonal='multiplicative', seasonal_periods=12)
     model_fit = model.fit()
@@ -112,6 +114,21 @@ if stock:
 
     st.plotly_chart(fig)
 
+    ## Forecasting with Prophet
+    st.subheader('Forecasting with Prophet')
+    df = stock_price[['Date', 'Close']]
+    df.rename(columns={'Date': 'ds', 'Close': 'y'}, inplace=True)
+    # Define the model and fit it to the data
+    model = Prophet()
+    model.fit(df)
+
+    # Generate future predictions
+    future = model.make_future_dataframe(periods=100)
+    forecast = model.predict(future)
+
+    # Plot the forecast
+    figProphet = plot_plotly(model, forecast)
+    st.plotly_chart(figProphet)
 
 
 
