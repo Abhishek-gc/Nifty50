@@ -101,7 +101,7 @@ if stock:
 
 
     ## Forecasting with TES
-    st.subheader('5 days Forecasting with Triple Exponential smoothing')
+    st.subheader('5 days Forecasting using Triple Exponential smoothing')
     # Build the Triple Exponential Smoothing model
     model = ExponentialSmoothing(stock_price['Close'], trend='add', seasonal='multiplicative', seasonal_periods=12)
     model_fit = model.fit()
@@ -116,7 +116,7 @@ if stock:
     st.plotly_chart(fig)
 
     ## Forecasting with Prophet
-    st.subheader('90 days Forecasting with Prophet')
+    st.subheader('90 days Forecasting using Fb-Prophet')
     df = stock_price[['Date', 'Close']]
     df.rename(columns={'Date': 'ds', 'Close': 'y'}, inplace=True)
     # Define the model and fit it to the data
