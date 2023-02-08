@@ -158,20 +158,3 @@ if stock:
     figProphet = plot_plotly(model, forecast)
     st.plotly_chart(figProphet)
 
-
-
-
-
-
-    
-
-    
-    
-
-
-
-
-
-
-
-
