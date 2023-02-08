@@ -6,7 +6,6 @@ import plotly.express as px
 import plotly.graph_objects as go
 from datetime import date, timedelta
 import pandas_datareader.data as pdr
-import skle
 from sklearn.metrics import (
     mean_squared_error as mse,
     mean_absolute_error as mae,
