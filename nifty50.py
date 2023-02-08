@@ -12,12 +12,13 @@ from prophet.plot import plot_plotly, plot_components_plotly
 yf.pdr_override()
 
 
-nifty_50 = ['ADANIPORTS.NS', 'ADANIENT.NS', 'APOLLOHOSP.NS', 'ASIANPAINT.NS', 'AXISBANK.NS', 'BAJAJ-AUTO.NS', 'BAJAJFINSV.NS', 'BAJFINANCE.NS', 'BHARTIARTL.NS', 'BPCL.NS', 'BRITANNIA.NS', 
+nifty_50 = ['ADANIENT.NS','ADANIPORTS.NS', 'APOLLOHOSP.NS', 'ASIANPAINT.NS', 'AXISBANK.NS', 'BAJAJ-AUTO.NS', 'BAJAJFINSV.NS', 'BAJFINANCE.NS', 'BHARTIARTL.NS', 'BPCL.NS', 'BRITANNIA.NS',
            'CIPLA.NS', 'COALINDIA.NS', 'DIVISLAB.NS', 'DRREDDY.NS', 'EICHERMOT.NS', 'GRASIM.NS', 'HCLTECH.NS', 'HDFC.NS', 'HDFCBANK.NS', 'HDFCLIFE.NS', 'HEROMOTOCO.NS', 'HINDALCO.NS', 'HINDUNILVR.NS', 'ICICIBANK.NS', 'INDUSINDBK.NS', 'INFY.NS', 'ITC.NS', 'JSWSTEEL.NS', 'KOTAKBANK.NS', 'LT.NS', 'M&M.NS', 'MARUTI.NS', 'NESTLEIND.NS', 'NTPC.NS', 'ONGC.NS', 'POWERGRID.NS', 'RELIANCE.NS', 'SBILIFE.NS', 'SBIN.NS', 'SUNPHARMA.NS', 'TATACONSUM.NS', 'TATAMOTORS.NS', 'TATASTEEL.NS', 'TCS.NS', 'TECHM.NS', 'TITAN.NS', 'ULTRACEMCO.NS', 'UPL.NS', 'WIPRO.NS']
 
 nifty_info = pd.read_csv('nifty50_info.csv')
 st.sidebar.title("Nifty 50 Stocks")
-stock = st.sidebar.selectbox("Select a stock", nifty_50)
+stock = st.sidebar.selectbox("Select a stock", nifty_50, 4)
+st.subheader('Price predictor')
 
 def get_workingdays(start, end, excluded=(6, 7)):
     days = []
@@ -29,8 +30,8 @@ def get_workingdays(start, end, excluded=(6, 7)):
         start += timedelta(days=1)
     return days
 
-start_date = date.today()
-end_date = (date.today() + timedelta(15))
+start_date = date.today() + timedelta(1)
+end_date = date.today() + timedelta(15)
 future_working_days = get_workingdays(start_date,end_date)[:10]
 
 if stock:
@@ -100,7 +101,7 @@ if stock:
 
 
     ## Forecasting with TES
-    st.subheader('Forecasting with Triple Exponential series')
+    st.subheader('5 days Forecasting with Triple Exponential series')
     # Build the Triple Exponential Smoothing model
     model = ExponentialSmoothing(stock_price['Close'], trend='add', seasonal='multiplicative', seasonal_periods=12)
     model_fit = model.fit()
@@ -115,7 +116,7 @@ if stock:
     st.plotly_chart(fig)
 
     ## Forecasting with Prophet
-    st.subheader('Forecasting with Prophet')
+    st.subheader('90 days Forecasting with Prophet')
     df = stock_price[['Date', 'Close']]
     df.rename(columns={'Date': 'ds', 'Close': 'y'}, inplace=True)
     # Define the model and fit it to the data
