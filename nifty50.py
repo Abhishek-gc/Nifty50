@@ -18,7 +18,7 @@ nifty_50 = ['ADANIENT.NS','ADANIPORTS.NS', 'APOLLOHOSP.NS', 'ASIANPAINT.NS', 'AX
 nifty_info = pd.read_csv('nifty50_info.csv')
 st.sidebar.title("Nifty 50 Stocks")
 stock = st.sidebar.selectbox("Select a stock", nifty_50, 4)
-st.subheader('Price predictor')
+st.subheader('Stock price predictor')
 
 def get_workingdays(start, end, excluded=(6, 7)):
     days = []
@@ -101,7 +101,7 @@ if stock:
 
 
     ## Forecasting with TES
-    st.subheader('5 days Forecasting with Triple Exponential series')
+    st.subheader('5 days Forecasting with Triple Exponential smoothing')
     # Build the Triple Exponential Smoothing model
     model = ExponentialSmoothing(stock_price['Close'], trend='add', seasonal='multiplicative', seasonal_periods=12)
     model_fit = model.fit()
