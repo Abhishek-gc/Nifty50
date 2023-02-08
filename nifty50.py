@@ -6,6 +6,11 @@ import plotly.express as px
 import plotly.graph_objects as go
 from datetime import date, timedelta
 import pandas_datareader.data as pdr
+from sklearn.metrics import (
+    mean_squared_error as mse,
+    mean_absolute_error as mae,
+    mean_absolute_percentage_error as mape
+)
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 from prophet import Prophet
 from prophet.plot import plot_plotly, plot_components_plotly
@@ -30,6 +35,12 @@ def get_workingdays(start, end, excluded=(6, 7)):
         start += timedelta(days=1)
     return days
 
+def performance(actual, predicted):
+    _mae = round(mae(actual, predicted))
+    _rmse = round(mse(actual, predicted)**0.5, 3)
+    _mape = round(mape(actual, predicted), 3)
+    return {'MAE': _mae, 'RMSE': _rmse, 'MAPE': _mape}
+
 start_date = date.today() + timedelta(1)
 end_date = date.today() + timedelta(15)
 future_working_days = get_workingdays(start_date,end_date)[:10]
@@ -52,7 +63,7 @@ if stock:
     stock_price.reset_index(inplace=True)
 
 
-    ## show stock price plot
+    ## plot stock price
     fig = px.line(stock_price, x='Date', y='Close')
     fig.update_xaxes(
         # rangeslider_visible=True,
@@ -88,6 +99,7 @@ if stock:
     stockDetail = pd.DataFrame(columns=['Current price', '1 week return', '1 month return', '3 months return', '1 year return'])
     stockDetail.loc[today] = [current_price.round(2), str(one_week_change)+" %", str(one_month_change)+" %", str(three_month_change)+" %", str(one_year_change)+" %" ]
     st.dataframe(stockDetail)
+    st.write("#"); st.write("#") ## createing extra space for separation
 
     # stockDetail = pd.DataFrame(columns=['Day', 'Price', 'Pct change'])
     # stockDetail.loc['Current day'] = [today,current_price , 0]
@@ -102,18 +114,33 @@ if stock:
 
     ## Forecasting with TES
     st.subheader('5 days Forecasting using Triple Exponential smoothing')
-    # Build the Triple Exponential Smoothing model
+    # Training
     model = ExponentialSmoothing(stock_price['Close'], trend='add', seasonal='multiplicative', seasonal_periods=12)
     model_fit = model.fit()
     forecast = model_fit.forecast(steps=5)
 
+    ## Plot forecast
     fig = go.Figure()
     fig.add_trace(go.Scatter( x=stock_price['Date'].tail(7), y=stock_price['Close'].tail(7), name='Actual',
                              line=dict(color='royalblue', width=3)))
     fig.add_trace(go.Scatter(x=future_working_days, y=forecast.values.tolist(), name='Forecast',
                              line=dict(color='firebrick', width=3)))
-
     st.plotly_chart(fig)
+
+    ## Backtest results
+    train_x = stock_price["Close"].loc[stock_price.index < stock_price.index[-5]].copy()
+    test_x = stock_price["Close"].loc[stock_price.index >= stock_price.index[-5]].copy()
+    tes = ExponentialSmoothing(train_x, trend='add', seasonal='multiplicative', seasonal_periods=12)
+    tes_fit = tes.fit()
+
+    test_pred = tes_fit.forecast(steps=5)
+    backtest_df = pd.DataFrame({'Day': stock_price['Date'].tail(5), 'Actual price':test_x, 'Predicted price':test_pred}).set_index('Day')
+    st.markdown('##### Backtest results:')
+    st.dataframe(backtest_df)
+    st.markdown('##### Performace metrics:')
+    st.text(performance(test_x.values.tolist(), test_pred.values.tolist()))
+    st.write("#"); st.write("#") ## createing extra space for separation
+
 
     ## Forecasting with Prophet
     st.subheader('90 days Forecasting using Fb-Prophet')
