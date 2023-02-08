@@ -6,4 +6,4 @@ pandas_datareader
 matplotlib
 statsmodels
 prophet
-sklearn
+scikit-learn
