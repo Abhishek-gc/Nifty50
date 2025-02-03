@@ -13,8 +13,8 @@ from sklearn.metrics import (
     mean_absolute_percentage_error as mape
 )
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
-from prophet import Prophet
-from prophet.plot import plot_plotly, plot_components_plotly
+# from prophet import Prophet
+# from prophet.plot import plot_plotly, plot_components_plotly
 yf.pdr_override()
 
 
@@ -143,19 +143,19 @@ if stock:
     st.write("#"); st.write("#") ## createing extra space for separation
 
 
-    ## Forecasting with Prophet
-    st.subheader('90 days Forecasting using Fb-Prophet')
-    df = stock_price[['Date', 'Close']]
-    df.rename(columns={'Date': 'ds', 'Close': 'y'}, inplace=True)
-    # Define the model and fit it to the data
-    model = Prophet()
-    model.fit(df)
+    # ## Forecasting with Prophet
+    # st.subheader('90 days Forecasting using Fb-Prophet')
+    # df = stock_price[['Date', 'Close']]
+    # df.rename(columns={'Date': 'ds', 'Close': 'y'}, inplace=True)
+    # # Define the model and fit it to the data
+    # model = Prophet()
+    # model.fit(df)
 
-    # Generate future predictions
-    future = model.make_future_dataframe(periods=100)
-    forecast = model.predict(future)
+    # # Generate future predictions
+    # future = model.make_future_dataframe(periods=100)
+    # forecast = model.predict(future)
 
-    # Plot the forecast
-    figProphet = plot_plotly(model, forecast)
-    st.plotly_chart(figProphet)
+    # # Plot the forecast
+    # figProphet = plot_plotly(model, forecast)
+    # st.plotly_chart(figProphet)
 
