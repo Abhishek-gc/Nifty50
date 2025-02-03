@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 import plotly.graph_objects as go
 from datetime import date, timedelta
-import pandas_datareader.data as pdr
+# import pandas_datareader.data as pdr
 import sklearn
 from sklearn.metrics import (
     mean_squared_error as mse,
@@ -15,7 +15,7 @@ from sklearn.metrics import (
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 # from prophet import Prophet
 # from prophet.plot import plot_plotly, plot_components_plotly
-yf.pdr_override()
+# yf.pdr_override()
 
 
 nifty_50 = ['ADANIENT.NS','ADANIPORTS.NS', 'APOLLOHOSP.NS', 'ASIANPAINT.NS', 'AXISBANK.NS', 'BAJAJ-AUTO.NS', 'BAJAJFINSV.NS', 'BAJFINANCE.NS', 'BHARTIARTL.NS', 'BPCL.NS', 'BRITANNIA.NS',

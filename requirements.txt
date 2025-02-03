@@ -2,8 +2,8 @@ pandas
 streamlit
 yfinance
 plotly
-pandas_datareader
+# pandas_datareader
 matplotlib
 statsmodels
-prophet
+# prophet
 scikit-learn
