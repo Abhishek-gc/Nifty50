@@ -13,3 +13,5 @@ Developed a stock forecasting app leveraging **Triple Exponential Smoothing** an
 
 Feel free to explore the app for detailed stock forecasts.
 
+![Portfolio Analysis App Screenshot](forecast.png)
+
