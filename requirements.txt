@@ -1,6 +1,6 @@
 pandas
 streamlit
-yfinance
+yfinance==0.2.54
 plotly
 # pandas_datareader
 matplotlib
